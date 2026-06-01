@@ -15,7 +15,7 @@ function clampSpeed(value: number) {
 }
 
 function getInitialPiIp() {
-  return window.localStorage.getItem(PI_IP_STORAGE_KEY) ?? "192.168.1.100";
+  return window.localStorage.getItem(PI_IP_STORAGE_KEY) ?? "192.168.0.29";
 }
 
 function App() {

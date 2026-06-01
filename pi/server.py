@@ -23,7 +23,7 @@ MJPEG_HOST = "0.0.0.0"
 MJPEG_PORT = 8081
 
 motor = MotorController()
-camera = CameraStream(width=1296, height=972, framerate=30, quality=80)
+camera = CameraStream(width=640, height=480, framerate=15, quality=70)
 clients = 0
 mjpeg_server: ThreadingHTTPServer | None = None
 
@@ -65,6 +65,7 @@ async def websocket_handler(ws):
     logger.info(f"Client connected: {ws.remote_address}")
     try:
         async for msg in ws:
+            logger.info(f"Received: {msg}")
             try:
                 data = json.loads(msg)
                 cmd_type = data.get("type")
