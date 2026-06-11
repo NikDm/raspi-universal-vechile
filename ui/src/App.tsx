@@ -4,6 +4,7 @@ import { useGamepad } from "./hooks/useGamepad";
 import { VideoFeed } from "./components/VideoFeed";
 import { Controls } from "./components/Controls";
 import { ConnectionIndicator } from "./components/ConnectionIndicator";
+import { MotorGauge } from "./components/MotorGauge";
 import type { Command } from "./types";
 
 const WS_PORT = 8080;
@@ -20,10 +21,27 @@ function getInitialPiIp() {
 
 function App() {
   const [piIp, setPiIp] = useState(getInitialPiIp);
+  const [speeds, setSpeeds] = useState({ left: 0, right: 0 });
   const prevSpeedsRef = useRef({ left: 0, right: 0 });
   const inputSourceRef = useRef<"keyboard" | "gamepad" | null>(null);
-  const { sendCommand, status: wsStatus } = useWebSocket({ url: `ws://${piIp}:${WS_PORT}` });
+  const { sendCommand: rawSendCommand, status: wsStatus } = useWebSocket({
+    url: `ws://${piIp}:${WS_PORT}`,
+  });
   const { state: gamepad } = useGamepad();
+
+  // Wrap sendCommand so every command (keyboard or gamepad) updates the
+  // visual speed gauge.
+  const sendCommand = useCallback(
+    (cmd: Command) => {
+      rawSendCommand(cmd);
+      if (cmd.type === "move") {
+        setSpeeds({ left: cmd.left, right: cmd.right });
+      } else {
+        setSpeeds({ left: 0, right: 0 });
+      }
+    },
+    [rawSendCommand]
+  );
 
   const handleCommand = useCallback(
     (cmd: Command) => {
@@ -130,9 +148,24 @@ function App() {
           display: "flex",
           flexDirection: "column",
           minHeight: 0,
+          position: "relative",
         }}
       >
         <VideoFeed src={`http://${piIp}:${MJPEG_PORT}/video`} />
+        <div
+          style={{
+            position: "absolute",
+            bottom: 12,
+            right: 12,
+            padding: "10px 12px",
+            background: "rgba(15, 15, 19, 0.7)",
+            border: "1px solid #2a2a3a",
+            borderRadius: 8,
+            backdropFilter: "blur(4px)",
+          }}
+        >
+          <MotorGauge left={speeds.left} right={speeds.right} />
+        </div>
       </div>
 
       <div

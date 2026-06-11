@@ -5,82 +5,122 @@ interface ControlsProps {
   onCommand: (cmd: Command) => void;
 }
 
-interface KeyState {
-  up: boolean;
-  down: boolean;
-  left: boolean;
-  right: boolean;
+const MAX_LEVEL = 10;
+const TURN_STEP = 2;
+
+interface MotorLevels {
+  left: number;
+  right: number;
+}
+
+function clampLevel(level: number): number {
+  return Math.max(-MAX_LEVEL, Math.min(MAX_LEVEL, level));
+}
+
+// Reduce the magnitude of a level toward 0 by `step`, without crossing 0.
+function reduceToward0(level: number, step: number): number {
+  if (level > 0) return Math.max(0, level - step);
+  if (level < 0) return Math.min(0, level + step);
+  return 0;
+}
+
+// Move `from` toward `target` by `step`, without overshooting past target.
+function moveToward(from: number, target: number, step: number): number {
+  if (from < target) return Math.min(target, from + step);
+  if (from > target) return Math.max(target, from - step);
+  return from;
+}
+
+// Steering: "straighten first, then steer".
+// `steerSide` is the direction key pressed. The motor on the OPPOSITE side is
+// raised first to match the steer side; once both are equal, the steer side's
+// motor is slowed toward 0 (the actual turn).
+//
+// Example (left=2, right=6):
+//   press Right (steerSide="right"): left<right, so raise left -> left=4
+//   press Right again:               left<right, so raise left -> left=6 (equal)
+//   press Right again:               equal, so slow right       -> right=4
+function steer(levels: MotorLevels, steerSide: "left" | "right"): MotorLevels {
+  const otherSide = steerSide === "left" ? "right" : "left";
+  const steerLevel = levels[steerSide];
+  const otherLevel = levels[otherSide];
+
+  // Compare magnitudes so this works in both forward and reverse.
+  if (Math.abs(otherLevel) < Math.abs(steerLevel)) {
+    // Straighten: raise the other (slower) side toward the steer side.
+    return { ...levels, [otherSide]: moveToward(otherLevel, steerLevel, TURN_STEP) };
+  }
+  // Equal (or other side already faster): steer by slowing the steer side.
+  return { ...levels, [steerSide]: reduceToward0(steerLevel, TURN_STEP) };
 }
 
 export function Controls({ onCommand }: ControlsProps) {
-  const keysRef = useRef<KeyState>({ up: false, down: false, left: false, right: false });
-
-  const resetKeys = useCallback(() => {
-    keysRef.current = { up: false, down: false, left: false, right: false };
-  }, []);
+  const levelsRef = useRef<MotorLevels>({ left: 0, right: 0 });
 
   const isTypingTarget = (target: EventTarget | null) => {
     return target instanceof HTMLElement && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
   };
 
-  const computeSpeeds = useCallback((): { left: number; right: number } => {
-    const k = keysRef.current;
-    let forward = 0;
-    let turn = 0;
-
-    if (k.up) forward += 1;
-    if (k.down) forward -= 1;
-    if (k.left) turn -= 1;
-    if (k.right) turn += 1;
-
-    const left = Math.max(-1, Math.min(1, forward + turn * 0.5));
-    const right = Math.max(-1, Math.min(1, forward - turn * 0.5));
-
-    return { left, right };
-  }, []);
-
-  const sendMoveCommand = useCallback(() => {
-    const { left, right } = computeSpeeds();
+  const sendLevels = useCallback(() => {
+    const { left, right } = levelsRef.current;
     if (left === 0 && right === 0) {
       onCommand({ type: "stop" });
     } else {
-      onCommand({ type: "move", left, right });
+      onCommand({ type: "move", left: left / MAX_LEVEL, right: right / MAX_LEVEL });
     }
-  }, [computeSpeeds, onCommand]);
+  }, [onCommand]);
+
+  const resetLevels = useCallback(() => {
+    levelsRef.current = { left: 0, right: 0 };
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.repeat) return;
+      const levels = levelsRef.current;
+
       switch (e.code) {
         case "ArrowUp":
         case "KeyW":
-          keysRef.current.up = true;
+          // Speed up both motors by one level (forward).
+          levelsRef.current = {
+            left: clampLevel(levels.left + 1),
+            right: clampLevel(levels.right + 1),
+          };
           break;
         case "ArrowDown":
         case "KeyS":
-          keysRef.current.down = true;
+          // Speed up both motors by one level (backward).
+          levelsRef.current = {
+            left: clampLevel(levels.left - 1),
+            right: clampLevel(levels.right - 1),
+          };
           break;
         case "ArrowLeft":
         case "KeyA":
-          keysRef.current.left = true;
+          // Straighten first (raise right toward left), then slow the left.
+          levelsRef.current = steer(levels, "left");
           break;
         case "ArrowRight":
         case "KeyD":
-          keysRef.current.right = true;
+          // Straighten first (raise left toward right), then slow the right.
+          levelsRef.current = steer(levels, "right");
           break;
         case "Space":
-          resetKeys();
-          onCommand({ type: "stop" });
+          resetLevels();
+          e.preventDefault();
+          sendLevels();
           return;
         default:
           return;
       }
+
       e.preventDefault();
-      sendMoveCommand();
+      sendLevels();
     };
 
     const stopOnBlur = () => {
-      resetKeys();
+      resetLevels();
       onCommand({ type: "stop" });
     };
 
@@ -90,59 +130,23 @@ export function Controls({ onCommand }: ControlsProps) {
       }
     };
 
-    const handleKeyUp = (e: KeyboardEvent) => {
-      switch (e.code) {
-        case "ArrowUp":
-        case "KeyW":
-          keysRef.current.up = false;
-          break;
-        case "ArrowDown":
-        case "KeyS":
-          keysRef.current.down = false;
-          break;
-        case "ArrowLeft":
-        case "KeyA":
-          keysRef.current.left = false;
-          break;
-        case "ArrowRight":
-        case "KeyD":
-          keysRef.current.right = false;
-          break;
-        default:
-          return;
-      }
-      e.preventDefault();
-      sendMoveCommand();
-    };
-
     const guardedKeyDown = (e: KeyboardEvent) => {
       if (isTypingTarget(e.target)) {
         return;
       }
-
       handleKeyDown(e);
     };
 
-    const guardedKeyUp = (e: KeyboardEvent) => {
-      if (isTypingTarget(e.target)) {
-        return;
-      }
-
-      handleKeyUp(e);
-    };
-
     window.addEventListener("keydown", guardedKeyDown);
-    window.addEventListener("keyup", guardedKeyUp);
     window.addEventListener("blur", stopOnBlur);
     document.addEventListener("visibilitychange", stopOnHidden);
 
     return () => {
       window.removeEventListener("keydown", guardedKeyDown);
-      window.removeEventListener("keyup", guardedKeyUp);
       window.removeEventListener("blur", stopOnBlur);
       document.removeEventListener("visibilitychange", stopOnHidden);
     };
-  }, [onCommand, resetKeys, sendMoveCommand]);
+  }, [onCommand, resetLevels, sendLevels]);
 
   return (
     <div
@@ -155,8 +159,9 @@ export function Controls({ onCommand }: ControlsProps) {
         fontFamily: "monospace",
       }}
     >
-      <span style={{ marginRight: 16 }}>Keyboard: WASD / Arrows to move, Space to brake</span>
-      <span>Connect a gamepad for analog control</span>
+      <span style={{ marginRight: 16 }}>
+        Up/Down: both motors +/- 1 level &nbsp;|&nbsp; Left/Right: straighten, then steer by 2 &nbsp;|&nbsp; Space: stop
+      </span>
     </div>
   );
 }
