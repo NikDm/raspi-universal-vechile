@@ -23,7 +23,7 @@ MJPEG_HOST = "0.0.0.0"
 MJPEG_PORT = 8081
 
 motor = MotorController()
-camera = CameraStream(width=640, height=480, framerate=15, quality=70)
+camera = CameraStream(width=960, height=720, framerate=15, quality=70)
 clients = 0
 mjpeg_server: ThreadingHTTPServer | None = None
 

@@ -41,8 +41,8 @@ class _StreamBuffer(io.BufferedIOBase):
 class CameraStream:
     def __init__(
         self,
-        width: int = 640,
-        height: int = 480,
+        width: int = 960,
+        height: int = 720,
         framerate: int = 15,
         quality: int = 70,
     ):
