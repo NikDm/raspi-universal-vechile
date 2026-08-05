@@ -22,6 +22,7 @@ function getInitialPiIp() {
 function App() {
   const [piIp, setPiIp] = useState(getInitialPiIp);
   const [speeds, setSpeeds] = useState({ left: 0, right: 0 });
+  const [lightOn, setLightOn] = useState(false);
   const prevSpeedsRef = useRef({ left: 0, right: 0 });
   const inputSourceRef = useRef<"keyboard" | "gamepad" | null>(null);
   const { sendCommand: rawSendCommand, status: wsStatus } = useWebSocket({
@@ -29,19 +30,27 @@ function App() {
   });
   const { state: gamepad } = useGamepad();
 
-  // Wrap sendCommand so every command (keyboard or gamepad) updates the
-  // visual speed gauge.
+  // Wrap sendCommand so every motion command (keyboard or gamepad) updates the
+  // visual speed gauge. Non-motion commands (e.g. light) leave it untouched.
   const sendCommand = useCallback(
     (cmd: Command) => {
       rawSendCommand(cmd);
       if (cmd.type === "move") {
         setSpeeds({ left: cmd.left, right: cmd.right });
-      } else {
+      } else if (cmd.type === "stop") {
         setSpeeds({ left: 0, right: 0 });
       }
     },
     [rawSendCommand]
   );
+
+  const toggleLight = useCallback(() => {
+    setLightOn((prev) => {
+      const next = !prev;
+      rawSendCommand({ type: "light", on: next });
+      return next;
+    });
+  }, [rawSendCommand]);
 
   const handleCommand = useCallback(
     (cmd: Command) => {
@@ -59,6 +68,26 @@ function App() {
   useEffect(() => {
     window.localStorage.setItem(PI_IP_STORAGE_KEY, piIp);
   }, [piIp]);
+
+  // 'L' key toggles the light (ignored while typing in an input).
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.repeat) return;
+      const target = e.target;
+      if (
+        target instanceof HTMLElement &&
+        ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)
+      ) {
+        return;
+      }
+      if (e.code === "KeyL") {
+        e.preventDefault();
+        toggleLight();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [toggleLight]);
 
   useEffect(() => {
     if (gamepad.connected) {
@@ -133,6 +162,34 @@ function App() {
               Gamepad connected
             </span>
           )}
+          <button
+            onClick={toggleLight}
+            title="Toggle light (L)"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "4px 10px",
+              fontSize: 13,
+              fontFamily: "monospace",
+              cursor: "pointer",
+              borderRadius: 4,
+              border: `1px solid ${lightOn ? "#eab308" : "#2a2a3a"}`,
+              background: lightOn ? "#3a3416" : "#0f0f13",
+              color: lightOn ? "#eab308" : "#888",
+            }}
+          >
+            <span
+              style={{
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                background: lightOn ? "#eab308" : "#444",
+                boxShadow: lightOn ? "0 0 6px #eab308" : "none",
+              }}
+            />
+            Light {lightOn ? "ON" : "OFF"}
+          </button>
           <ConnectionIndicator
             status={wsStatus}
             ip={piIp}

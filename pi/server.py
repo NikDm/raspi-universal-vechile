@@ -9,6 +9,7 @@ from websockets.asyncio.server import serve
 from websockets.exceptions import ConnectionClosed
 
 from motor_controller import MotorController
+from light_controller import LightController
 from camera import CameraStream
 
 logging.basicConfig(
@@ -23,6 +24,7 @@ MJPEG_HOST = "0.0.0.0"
 MJPEG_PORT = 8081
 
 motor = MotorController()
+light = LightController(pin=25)
 camera = CameraStream(width=960, height=720, framerate=15, quality=70)
 clients = 0
 mjpeg_server: ThreadingHTTPServer | None = None
@@ -75,9 +77,23 @@ async def websocket_handler(ws):
                     motor.move(left, right)
                 elif cmd_type == "stop":
                     motor.stop()
+                elif cmd_type == "light":
+                    if "on" in data:
+                        light.set(bool(data.get("on")))
+                    else:
+                        light.toggle()
                 else:
                     logger.warning(f"Unknown command type: {cmd_type}")
-                await ws.send(json.dumps({"type": "status", "left": motor.speeds[0], "right": motor.speeds[1]}))
+                await ws.send(
+                    json.dumps(
+                        {
+                            "type": "status",
+                            "left": motor.speeds[0],
+                            "right": motor.speeds[1],
+                            "light": light.is_on,
+                        }
+                    )
+                )
             except json.JSONDecodeError:
                 logger.warning(f"Invalid JSON: {msg}")
             except Exception as exc:
@@ -118,6 +134,7 @@ async def run_servers():
     mjpeg_server.server_close()
     camera.stop()
     motor.close()
+    light.close()
 
 
 def main():

@@ -160,7 +160,7 @@ export function Controls({ onCommand }: ControlsProps) {
       }}
     >
       <span style={{ marginRight: 16 }}>
-        Up/Down: both motors +/- 1 level &nbsp;|&nbsp; Left/Right: straighten, then steer by 2 &nbsp;|&nbsp; Space: stop
+        Up/Down: both motors +/- 1 level &nbsp;|&nbsp; Left/Right: straighten, then steer by 2 &nbsp;|&nbsp; Space: stop &nbsp;|&nbsp; L: light
       </span>
     </div>
   );
