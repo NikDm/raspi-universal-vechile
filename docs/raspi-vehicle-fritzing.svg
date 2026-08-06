@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100">
+  <defs>
+    <style>
+      .title{font:700 30px sans-serif;fill:#222}.sub{font:16px sans-serif;fill:#444}
+      .label{font:700 16px sans-serif;fill:#fff}.dark{font:700 16px sans-serif;fill:#222}
+      .small{font:14px monospace;fill:#222}.tiny{font:12px sans-serif;fill:#333}
+      .wire{fill:none;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+      .pad{fill:#ddd;stroke:#666;stroke-width:2}.pin{fill:#f0c949;stroke:#7c681d;stroke-width:2}
+    </style>
+    <filter id="shadow"><feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity=".25"/></filter>
+  </defs>
+  <rect width="1600" height="1100" fill="#fafafa"/>
+  <text x="50" y="55" class="title">RasPi Vehicle — Fritzing-style wiring</text>
+  <text x="50" y="84" class="sub">Compact TB6612FNG module • BCM GPIO numbering • Light intentionally omitted</text>
+
+  <!-- Wires behind parts -->
+  <!-- Motor outputs -->
+  <path class="wire" stroke="#28a745" d="M560 510 H420 V380 H325"/>
+  <path class="wire" stroke="#e3b21a" d="M560 550 H400 V410 H325"/>
+  <path class="wire" stroke="#2878c8" d="M560 630 H440 V680 H325"/>
+  <path class="wire" stroke="#8e44ad" d="M560 590 H420 V710 H325"/>
+
+  <!-- Control signals: driver right to Pi header -->
+  <path class="wire" stroke="#16a085" d="M860 390 H970 V430 H1100"/>
+  <path class="wire" stroke="#8e44ad" d="M860 430 H950 V510 H1100"/>
+  <path class="wire" stroke="#2980b9" d="M860 470 H1100"/>
+  <path class="wire" stroke="#e67e22" d="M860 550 H980 V590 H1100"/>
+  <path class="wire" stroke="#795548" d="M860 590 H960 V630 H1100"/>
+  <path class="wire" stroke="#f1c40f" d="M860 630 H940 V550 H1100"/>
+
+  <!-- 3V3 branches to VCC and STBY -->
+  <path class="wire" stroke="#e32620" d="M1100 350 H1010 V510 H860"/>
+  <path class="wire" stroke="#e32620" d="M1010 350 V250 H500 V430 H560"/>
+  <circle cx="1010" cy="350" r="8" fill="#e32620"/>
+
+  <!-- Common ground: Pi, driver and battery negative -->
+  <path class="wire" stroke="#222" d="M1100 390 H1030 V790 H500 V470 H560"/>
+  <path class="wire" stroke="#222" d="M660 170 V210 H500 V470"/>
+  <circle cx="500" cy="470" r="8" fill="#222"/>
+
+  <!-- Motor battery VM -->
+  <path class="wire" stroke="#e32620" d="M610 170 V200 H470 V390 H560"/>
+
+  <!-- Camera ribbon and Pi power -->
+  <path d="M1260 780 V895" stroke="#d7e8f5" stroke-width="44" fill="none"/>
+  <path d="M1260 780 V895" stroke="#82a9c4" stroke-width="2" stroke-dasharray="3 5" fill="none"/>
+  <path class="wire" stroke="#333" d="M1410 720 H1480 V940 H1410"/>
+
+  <!-- Motors -->
+  <g filter="url(#shadow)">
+    <rect x="70" y="320" width="255" height="130" rx="18" fill="#f2c313" stroke="#ad8600" stroke-width="3"/>
+    <rect x="70" y="345" width="75" height="80" rx="10" fill="#aaa" stroke="#666" stroke-width="3"/>
+    <circle cx="300" cy="385" r="16" fill="#eee" stroke="#aaa"/>
+    <circle cx="325" cy="380" r="7" fill="#28a745"/><circle cx="325" cy="410" r="7" fill="#e3b21a"/>
+    <text x="170" y="370" class="dark">LEFT MOTOR</text><text x="170" y="397" class="small">AO1 / AO2</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="70" y="620" width="255" height="130" rx="18" fill="#f2c313" stroke="#ad8600" stroke-width="3"/>
+    <rect x="70" y="645" width="75" height="80" rx="10" fill="#aaa" stroke="#666" stroke-width="3"/>
+    <circle cx="300" cy="685" r="16" fill="#eee" stroke="#aaa"/>
+    <circle cx="325" cy="680" r="7" fill="#2878c8"/><circle cx="325" cy="710" r="7" fill="#8e44ad"/>
+    <text x="170" y="670" class="dark">RIGHT MOTOR</text><text x="170" y="697" class="small">BO1 / BO2</text>
+  </g>
+
+  <!-- Battery pack -->
+  <g filter="url(#shadow)">
+    <rect x="555" y="100" width="250" height="70" rx="12" fill="#333"/>
+    <rect x="575" y="112" width="45" height="46" rx="8" fill="#9bc34a"/>
+    <rect x="630" y="112" width="45" height="46" rx="8" fill="#9bc34a"/>
+    <rect x="685" y="112" width="45" height="46" rx="8" fill="#9bc34a"/>
+    <rect x="740" y="112" width="45" height="46" rx="8" fill="#9bc34a"/>
+    <text x="580" y="95" class="dark">4×AA NiMH MOTOR POWER</text>
+    <circle cx="610" cy="170" r="7" fill="#e32620"/><circle cx="660" cy="170" r="7" fill="#222"/>
+  </g>
+
+  <!-- Exact compact driver -->
+  <g filter="url(#shadow)">
+    <rect x="560" y="350" width="300" height="360" rx="8" fill="#d92323" stroke="#921616" stroke-width="4"/>
+    <rect x="680" y="455" width="62" height="140" rx="4" fill="#222"/>
+    <text x="690" y="482" class="tiny" fill="#ccc">TB6612</text>
+    <text x="690" y="500" class="tiny" fill="#ccc">FNG</text>
+    <text x="655" y="680" class="label">MOTOR DRIVER</text>
+    <!-- left pads -->
+    <g>
+      <circle class="pad" cx="560" cy="390" r="11"/><text x="580" y="396" class="label">VM</text>
+      <circle class="pad" cx="560" cy="430" r="11"/><text x="580" y="436" class="label">VCC</text>
+      <circle class="pad" cx="560" cy="470" r="11"/><text x="580" y="476" class="label">GND</text>
+      <circle class="pad" cx="560" cy="510" r="11"/><text x="580" y="516" class="label">AO1</text>
+      <circle class="pad" cx="560" cy="550" r="11"/><text x="580" y="556" class="label">AO2</text>
+      <circle class="pad" cx="560" cy="590" r="11"/><text x="580" y="596" class="label">BO2</text>
+      <circle class="pad" cx="560" cy="630" r="11"/><text x="580" y="636" class="label">BO1</text>
+      <circle class="pad" cx="560" cy="670" r="11"/><text x="580" y="676" class="label">GND</text>
+    </g>
+    <!-- right pads -->
+    <g text-anchor="end">
+      <circle class="pad" cx="860" cy="390" r="11"/><text x="840" y="396" class="label">PWMA</text>
+      <circle class="pad" cx="860" cy="430" r="11"/><text x="840" y="436" class="label">AI2</text>
+      <circle class="pad" cx="860" cy="470" r="11"/><text x="840" y="476" class="label">AI1</text>
+      <circle class="pad" cx="860" cy="510" r="11"/><text x="840" y="516" class="label">STBY</text>
+      <circle class="pad" cx="860" cy="550" r="11"/><text x="840" y="556" class="label">BI1</text>
+      <circle class="pad" cx="860" cy="590" r="11"/><text x="840" y="596" class="label">BI2</text>
+      <circle class="pad" cx="860" cy="630" r="11"/><text x="840" y="636" class="label">PWMB</text>
+      <circle class="pad" cx="860" cy="670" r="11"/><text x="840" y="676" class="label">GND</text>
+    </g>
+  </g>
+
+  <!-- Pi Zero -->
+  <g filter="url(#shadow)">
+    <rect x="1100" y="270" width="360" height="510" rx="35" fill="#328e55" stroke="#176638" stroke-width="4"/>
+    <circle cx="1140" cy="310" r="20" fill="#e7c858"/><circle cx="1420" cy="310" r="20" fill="#e7c858"/>
+    <circle cx="1140" cy="740" r="20" fill="#e7c858"/><circle cx="1420" cy="740" r="20" fill="#e7c858"/>
+    <rect x="1210" y="455" width="150" height="130" rx="8" fill="#263238"/>
+    <text x="1240" y="515" class="label">Raspberry Pi</text><text x="1250" y="542" class="label">Zero 2 W</text>
+    <text x="1160" y="305" class="label">40-PIN GPIO HEADER</text>
+    <!-- selected physical pins -->
+    <g>
+      <circle class="pin" cx="1100" cy="350" r="9"/><text x="1120" y="356" class="small">pin 1 — 3V3</text>
+      <circle class="pin" cx="1100" cy="390" r="9"/><text x="1120" y="396" class="small">pin 6 — GND</text>
+      <circle class="pin" cx="1100" cy="430" r="9"/><text x="1120" y="436" class="small">pin 11 — GPIO17</text>
+      <circle class="pin" cx="1100" cy="470" r="9"/><text x="1120" y="476" class="small">pin 12 — GPIO18</text>
+      <circle class="pin" cx="1100" cy="510" r="9"/><text x="1120" y="516" class="small">pin 13 — GPIO27</text>
+      <circle class="pin" cx="1100" cy="550" r="9"/><text x="1120" y="556" class="small">pin 15 — GPIO22</text>
+      <circle class="pin" cx="1100" cy="590" r="9"/><text x="1120" y="596" class="small">pin 16 — GPIO23</text>
+      <circle class="pin" cx="1100" cy="630" r="9"/><text x="1120" y="636" class="small">pin 18 — GPIO24</text>
+    </g>
+    <rect x="1215" y="760" width="90" height="22" fill="#ddd"/><text x="1210" y="805" class="tiny">CSI CAMERA</text>
+    <rect x="1438" y="690" width="24" height="60" fill="#bbb"/><text x="1365" y="680" class="tiny">5V USB POWER</text>
+  </g>
+
+  <!-- Camera -->
+  <g filter="url(#shadow)">
+    <rect x="1160" y="895" width="200" height="125" rx="12" fill="#287d48"/>
+    <circle cx="1260" cy="955" r="42" fill="#222" stroke="#555" stroke-width="8"/>
+    <circle cx="1260" cy="955" r="18" fill="#406080"/>
+    <text x="1180" y="1045" class="dark">CSI CAMERA MODULE</text>
+  </g>
+
+  <!-- Pi power bank -->
+  <g filter="url(#shadow)">
+    <rect x="1390" y="890" width="150" height="130" rx="24" fill="#262626"/>
+    <text x="1410" y="945" class="label">5V / 3A</text><text x="1404" y="970" class="label">PI POWER</text>
+    <circle cx="1465" cy="995" r="5" fill="#4bc5ff"/>
+  </g>
+
+  <!-- Safety notices -->
+  <g>
+    <rect x="50" y="880" width="440" height="145" rx="18" fill="#fff2c9" stroke="#d79b00" stroke-width="4"/>
+    <text x="80" y="925" class="dark">COMMON GROUND REQUIRED</text>
+    <text x="80" y="958" class="small">Pi GND + driver GND + battery negative</text>
+    <text x="80" y="990" class="small">must be the same electrical net.</text>
+  </g>
+  <g>
+    <rect x="520" y="880" width="480" height="145" rx="18" fill="#fff" stroke="#c62828" stroke-width="5"/>
+    <text x="555" y="935" style="font:700 23px sans-serif;fill:#c62828">DO NOT CONNECT VM TO PI 3V3/5V</text>
+    <text x="555" y="975" class="small">Pi positive power and motor positive power stay separate.</text>
+  </g>
+
+  <!-- Connection legend -->
+  <text x="1050" y="1050" class="tiny">Signal mapping verified against pi/motor_controller.py</text>
+</svg>

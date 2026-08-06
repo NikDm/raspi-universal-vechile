@@ -40,6 +40,9 @@ BO1 / BO2        →  Right motor
 
 Note: Default GPIO pins can be changed in `pi/motor_controller.py`.
 
+For the complete motor, power, camera, and light diagram, see
+[Complete hardware wiring](docs/WIRING.md).
+
 ## Pi Setup
 
 ### 1. Install Raspberry Pi OS
