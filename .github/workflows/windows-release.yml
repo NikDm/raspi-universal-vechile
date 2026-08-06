@@ -1,0 +1,57 @@
+name: Windows desktop release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ui
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+
+      - name: Verify tag matches package version
+        shell: pwsh
+        run: |
+          $packageVersion = (Get-Content package.json | ConvertFrom-Json).version
+          $tagVersion = "${{ github.ref_name }}" -replace '^v', ''
+          if ($tagVersion -ne $packageVersion) {
+            throw "Tag ${{ github.ref_name }} does not match ui/package.json version $packageVersion"
+          }
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build strict TypeScript UI
+        run: npm run build
+
+      - name: Build unsigned Windows installer
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: npm run desktop:dist
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ui/release/RasPi-Vehicle-Control-Setup-*-win7-compatible-x64.exe
+          generate_release_notes: true
+          body: |
+            Unsigned Windows x64 installer for RasPi Vehicle Control.
+
+            Windows may display SmartScreen or unknown-publisher warnings because this installer is not code-signed. Electron 22 is retained for Windows 7 compatibility and is end-of-life; use this controller only on a trusted local network.

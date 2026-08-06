@@ -1,6 +1,14 @@
 # RasPi Universal Vehicle
 
-A Raspberry Pi Zero 2 W-powered vehicle with dual motor control and live camera feed, controlled from a PC browser.
+A Raspberry Pi Zero 2 W-powered vehicle with dual motor control and live camera
+feed, controlled from a PC browser or the Windows desktop application.
+
+> [!WARNING]
+> The Windows application uses Electron 22 to retain Windows 7 compatibility.
+> Electron 22 and its embedded Chromium version are end-of-life and receive no
+> security fixes. The Pi protocol is also unencrypted and unauthenticated. Use
+> this controller only with a vehicle on a trusted local network; it is not safe
+> to expose to the internet.
 
 ## Hardware
 
@@ -151,6 +159,35 @@ sudo systemctl start vehicle.service
 
 ## PC Setup
 
+### Windows desktop application
+
+The release installer supports x64 editions of Windows 7 SP1, Windows 8.1,
+Windows 10, and Windows 11. Windows 7 must have current SHA-2 code-signing and
+TLS-related operating-system updates installed. Node.js and development tools
+are not required to run the installed application.
+
+1. Download
+   `RasPi-Vehicle-Control-Setup-<version>-win7-compatible-x64.exe` from the
+   matching GitHub Release.
+2. Run the installer. It installs for the current user without administrator
+   privileges and creates Desktop and Start Menu shortcuts.
+3. Start **RasPi Vehicle Control**, enter the Pi hostname or IP address, and use
+   the controls as described below. The address is saved between launches.
+
+The installer is currently unsigned, so Windows may show an unknown-publisher
+prompt or SmartScreen warning. Verify that the file came from this repository's
+GitHub Release before choosing to run it. If Windows 7 cannot access GitHub
+because its browser or TLS support is too old, download the installer on a
+supported computer and transfer it using removable media or another trusted
+local method.
+
+To uninstall, open **Control Panel → Programs and Features**, select
+**RasPi Vehicle Control**, and choose **Uninstall**. Uninstalling leaves the
+saved Pi address in the current user's application data so a reinstall retains
+it.
+
+### Browser development setup
+
 ### Install Node.js
 
 Requires Node.js 18+.
@@ -169,6 +206,46 @@ npm run dev
 Open http://localhost:3000 in your browser.
 
 Enter the Pi's IP address in the input field. The UI will auto-connect and remember the last value in local storage.
+
+### Build or run the desktop application locally
+
+Use Node.js 18 or newer for local development. Release automation uses Node.js
+22. From the `ui` directory:
+
+```bash
+npm ci
+npm run desktop:run
+```
+
+`desktop:run` builds the UI and launches Electron. It does not start the Pi
+server or a Vite development server.
+
+Create the unsigned Windows x64 installer on Windows with:
+
+```powershell
+npm ci
+npm run build
+npm run desktop:dist
+```
+
+The installer is written to
+`ui/release/RasPi-Vehicle-Control-Setup-<version>-win7-compatible-x64.exe`.
+Windows 7 is a runtime target, not a supported build environment.
+
+### Publish a Windows release
+
+1. Set `ui/package.json` to the release version and commit the package and
+   lock files.
+2. Create and push a matching `v<version>` tag. For version `1.0.0`:
+
+   ```bash
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+
+The Windows workflow checks that the tag and package version match, runs
+`npm ci` and the strict UI build on Windows, builds the unsigned installer,
+and attaches it to a versioned GitHub Release.
 
 ## Usage
 
@@ -192,8 +269,8 @@ Connect any USB or Bluetooth gamepad (Xbox, PlayStation, etc.). The left stick c
 
 ```
 ┌────────────────────────────┐
-│     PC Browser             │
-│  React + TypeScript UI      │
+│ PC Browser / Windows App   │
+│  React + TypeScript UI     │
 │  - Video feed (MJPEG)      │
 │  - WebSocket controls       │
 │  - Gamepad / keyboard       │
@@ -222,6 +299,9 @@ raspi-universal-vechile/
 │   ├── camera.py          # picamera2 MJPEG
 │   └── requirements.txt   # Python deps
 ├── ui/
+│   ├── desktop/
+│   │   ├── main.cjs       # Hardened Electron main process
+│   │   └── icon.png       # Window, executable, and shortcut icon
 │   ├── src/
 │   │   ├── App.tsx        # Main app
 │   │   ├── types.ts       # Shared types
@@ -235,11 +315,31 @@ raspi-universal-vechile/
 │   ├── package.json
 │   ├── vite.config.ts
 │   └── tsconfig.json
+├── .github/workflows/
+│   └── windows-release.yml # Tagged Windows release build
 ├── deploy.sh              # Deploy script
+├── TODO.md                 # Proposed work and completion tracking
 └── README.md
 ```
 
 ## Troubleshooting
+
+### Windows application does not start
+
+- Confirm the computer is running an x64 edition of a supported Windows
+  version. There is no 32-bit package.
+- On Windows 7, install SP1 and current SHA-2 and TLS-related operating-system
+  updates, then reboot.
+- Re-download the installer from the matching GitHub Release if Windows reports
+  that it is damaged. An unknown-publisher warning is expected because releases
+  are not yet code-signed.
+- The application should still open when the Pi or camera is unavailable. Check
+  that the Pi is powered on, both devices are on the same trusted LAN, and ports
+  8080 and 8081 are not blocked if controls or video remain disconnected.
+
+Electron 22 is deliberately pinned for Windows 7 support and is end-of-life.
+Do not browse arbitrary sites in the application or expose the Pi services to
+the internet.
 
 ### Camera not detected
 ```bash

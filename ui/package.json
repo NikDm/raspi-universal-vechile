@@ -2,11 +2,16 @@
   "name": "raspi-vehicle-ui",
   "private": true,
   "version": "1.0.0",
+  "description": "Desktop and browser controller for the RasPi Universal Vehicle",
+  "author": "nikdm",
+  "main": "desktop/main.cjs",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "desktop:run": "npm run build && electron .",
+    "desktop:dist": "npm run build && electron-builder --win nsis --x64"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -16,7 +21,43 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "electron": "22.3.27",
+    "electron-builder": "24.13.3",
     "typescript": "^5.5.3",
     "vite": "^5.4.2"
+  },
+  "build": {
+    "appId": "io.github.nikdm.raspi-vehicle-control",
+    "productName": "RasPi Vehicle Control",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "desktop/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "desktop/icon.png",
+      "artifactName": "RasPi-Vehicle-Control-Setup-${version}-win7-compatible-x64.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowElevation": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "RasPi Vehicle Control",
+      "deleteAppDataOnUninstall": false
+    }
   }
 }
