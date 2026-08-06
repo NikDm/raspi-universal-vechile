@@ -6,16 +6,10 @@ vehicle hardware must not be marked complete based only on desktop testing.
 
 ## Safety and control
 
-- [ ] Add a server-side motion watchdog that stops both motors when move commands
-  are no longer received within a short, documented timeout.
-- [ ] Define and implement control ownership when multiple WebSocket clients are
-  connected so one client cannot unexpectedly override another.
 - [ ] Reject non-finite, malformed, or out-of-range command values before they
   reach the motor controller; retain motor-side clamping as a final safeguard.
 - [ ] Document and test emergency-stop behavior for browser focus loss, controller
   disconnect, WebSocket loss, last-client disconnect, and server shutdown.
-- [ ] Verify motor direction, soft-start, stopping distance, and GPIO cleanup on
-  the assembled vehicle with its wheels safely raised before a floor test.
 
 ## Reliability and observability
 
@@ -24,13 +18,6 @@ vehicle hardware must not be marked complete based only on desktop testing.
   by the Pi rather than relying only on locally requested state.
 - [ ] Add a lightweight health/status endpoint suitable for troubleshooting the
   WebSocket server, camera stream, and connected-client count.
-- [ ] Review camera-client shutdown behavior and confirm repeated reconnects do
-  not leave threads or sockets behind on the Pi Zero 2 W.
-- [ ] Allow the Python server to start and keep motor and light controls available
-  when no camera is connected; log a clear camera error to the console instead of
-  crashing.
-- [ ] Measure CPU use, memory use, video latency, and control latency on hardware;
-  record acceptable targets and the tested camera settings.
 
 ## Testing and developer workflow
 
@@ -45,7 +32,7 @@ vehicle hardware must not be marked complete based only on desktop testing.
   disconnect, light, camera, and clean shutdown behavior.
 - [x] Create a Windows executable that starts the UI with one click, and document
   how to build, distribute, run, and troubleshoot it.
-
+  
 ## Documentation and setup
 
 - [ ] Reconcile README examples with current defaults, including camera settings,
@@ -63,11 +50,7 @@ vehicle hardware must not be marked complete based only on desktop testing.
 
 These are ideas, not existing or committed functionality.
 
-- [ ] Consider a low-bandwidth operating mode for weaker Wi-Fi connections.
 - [ ] Consider configurable steering sensitivity, deadzone, and maximum speed.
-- [ ] Consider battery-voltage monitoring with a clearly documented sensor circuit.
-- [ ] Consider authenticated and encrypted control before supporting operation
-  outside a trusted local network.
 - [ ] Consider recording diagnostic events without writing excessively to the
   Raspberry Pi SD card.
 
