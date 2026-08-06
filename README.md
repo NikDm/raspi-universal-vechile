@@ -161,14 +161,13 @@ sudo systemctl start vehicle.service
 
 ### Windows desktop application
 
-The release installer supports x64 editions of Windows 7 SP1, Windows 8.1,
-Windows 10, and Windows 11. Windows 7 must have current SHA-2 code-signing and
-TLS-related operating-system updates installed. Node.js and development tools
-are not required to run the installed application.
+Separate installers support 32-bit and x64 editions of Windows 7 SP1, Windows
+8.1, and Windows 10. Use the x64 installer on Windows 11. Windows 7 must have
+current SHA-2 code-signing and TLS-related operating-system updates installed.
+Node.js and development tools are not required to run the installed application.
 
-1. Download
-   `RasPi-Vehicle-Control-Setup-<version>-win7-compatible-x64.exe` from the
-   matching GitHub Release.
+1. Download the matching installer from the GitHub Release: choose the `ia32`
+   filename for 32-bit Windows or `x64` for 64-bit Windows.
 2. Run the installer. It installs for the current user without administrator
    privileges and creates Desktop and Start Menu shortcuts.
 3. Start **RasPi Vehicle Control**, enter the Pi hostname or IP address, and use
@@ -220,7 +219,7 @@ npm run desktop:run
 `desktop:run` builds the UI and launches Electron. It does not start the Pi
 server or a Vite development server.
 
-Create the unsigned Windows x64 installer on Windows with:
+Create both unsigned Windows installers on Windows with:
 
 ```powershell
 npm ci
@@ -228,9 +227,10 @@ npm run build
 npm run desktop:dist
 ```
 
-The installer is written to
-`ui/release/RasPi-Vehicle-Control-Setup-<version>-win7-compatible-x64.exe`.
-Windows 7 is a runtime target, not a supported build environment.
+The installers are written to `ui/release/` as
+`RasPi-Vehicle-Control-Setup-<version>-win7-compatible-ia32.exe` and
+`RasPi-Vehicle-Control-Setup-<version>-win7-compatible-x64.exe`. Windows 7 is
+a runtime target, not a supported build environment.
 
 ### Publish a Windows release
 
@@ -326,8 +326,8 @@ raspi-universal-vechile/
 
 ### Windows application does not start
 
-- Confirm the computer is running an x64 edition of a supported Windows
-  version. There is no 32-bit package.
+- Confirm the installer architecture matches Windows: `ia32` for 32-bit or
+  `x64` for 64-bit. Use x64 on Windows 11.
 - On Windows 7, install SP1 and current SHA-2 and TLS-related operating-system
   updates, then reboot.
 - Re-download the installer from the matching GitHub Release if Windows reports

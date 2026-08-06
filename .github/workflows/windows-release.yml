@@ -49,9 +49,9 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: ui/release/RasPi-Vehicle-Control-Setup-*-win7-compatible-x64.exe
+          files: ui/release/RasPi-Vehicle-Control-Setup-*-win7-compatible-*.exe
           generate_release_notes: true
           body: |
-            Unsigned Windows x64 installer for RasPi Vehicle Control.
+            Unsigned Windows x64 and 32-bit (ia32) installers for RasPi Vehicle Control.
 
             Windows may display SmartScreen or unknown-publisher warnings because this installer is not code-signed. Electron 22 is retained for Windows 7 compatibility and is end-of-life; use this controller only on a trusted local network.

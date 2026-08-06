@@ -11,7 +11,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "desktop:run": "npm run build && electron .",
-    "desktop:dist": "npm run build && electron-builder --win nsis --x64"
+    "desktop:dist": "npm run build && electron-builder --win nsis --x64 --ia32"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -43,12 +43,13 @@
         {
           "target": "nsis",
           "arch": [
-            "x64"
+            "x64",
+            "ia32"
           ]
         }
       ],
       "icon": "desktop/icon.png",
-      "artifactName": "RasPi-Vehicle-Control-Setup-${version}-win7-compatible-x64.${ext}"
+      "artifactName": "RasPi-Vehicle-Control-Setup-${version}-win7-compatible-${arch}.${ext}"
     },
     "nsis": {
       "oneClick": true,
