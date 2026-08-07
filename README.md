@@ -337,6 +337,8 @@ raspi-universal-vechile/
 - The application should still open when the Pi or camera is unavailable. Check
   that the Pi is powered on, both devices are on the same trusted LAN, and ports
   8080 and 8081 are not blocked if controls or video remain disconnected.
+- After a connection interruption, the controls and camera feed reconnect
+  automatically. The camera feed retries every three seconds while unavailable.
 
 Electron 22 is deliberately pinned for Windows 7 support and is end-of-life.
 Do not browse arbitrary sites in the application or expose the Pi services to

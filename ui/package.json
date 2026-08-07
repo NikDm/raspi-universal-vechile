@@ -1,7 +1,7 @@
 {
   "name": "raspi-vehicle-ui",
   "private": true,
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Desktop and browser controller for the RasPi Universal Vehicle",
   "author": "nikdm",
   "main": "desktop/main.cjs",
