@@ -111,7 +111,7 @@ Or manually:
 scp -r pi pi@vehicle.local:/home/pi/vehicle
 ```
 
-### 5. Configure and Run
+### 5. Configure and Start at Boot
 
 SSH into the Pi:
 
@@ -125,36 +125,36 @@ Find the Pi's IP address:
 hostname -I
 ```
 
-Run the server:
+Install the included systemd service and start it immediately:
 ```bash
-python3 server.py
+sudo install -m 0644 vehicle.service /etc/systemd/system/vehicle.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now vehicle.service
 ```
 
-For auto-start on boot (optional):
-```bash
-# Create systemd service
-sudo nano /etc/systemd/system/vehicle.service
-```
-
-```ini
-[Unit]
-Description=RasPi Vehicle Server
-After=network.target
-
-[Service]
-Type=simple
-User=pi
-WorkingDirectory=/home/pi/vehicle
-ExecStart=/usr/bin/python3 server.py
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
-```
+The service now starts automatically on every boot. Confirm that it is running:
 
 ```bash
-sudo systemctl enable vehicle.service
-sudo systemctl start vehicle.service
+systemctl status vehicle.service
+```
+
+Press `q` to exit the status view. To follow the server logs:
+
+```bash
+journalctl -u vehicle.service -f
+```
+
+After deploying later code changes, restart the running server:
+
+```bash
+sudo systemctl restart vehicle.service
+```
+
+If `vehicle.service` itself changes, repeat the `install` and `daemon-reload`
+commands before restarting. To disable automatic startup and stop the server:
+
+```bash
+sudo systemctl disable --now vehicle.service
 ```
 
 ## PC Setup
@@ -297,6 +297,7 @@ raspi-universal-vechile/
 │   ├── server.py          # Main entry point
 │   ├── motor_controller.py # gpiozero wrapper
 │   ├── camera.py          # picamera2 MJPEG
+│   ├── vehicle.service    # systemd boot service
 │   └── requirements.txt   # Python deps
 ├── ui/
 │   ├── desktop/

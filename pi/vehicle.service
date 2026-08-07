@@ -1,0 +1,15 @@
+[Unit]
+Description=RasPi Universal Vehicle server
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/vehicle
+ExecStart=/usr/bin/python3 /home/pi/vehicle/server.py
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

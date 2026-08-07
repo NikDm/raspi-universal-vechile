@@ -12,6 +12,7 @@ The long-term direction is stronger agentic support and reliable, task-oriented 
 - `pi/motor_controller.py`: TB6612FNG/gpiozero motor control, clamping, soft-start, and emergency stop behavior.
 - `pi/light_controller.py`: GPIO light control (GPIO 25 by default).
 - `pi/camera.py`: Picamera2 hardware-assisted MJPEG capture.
+- `pi/vehicle.service`: systemd unit that runs the Python server at boot on the Pi.
 - `ui/src/App.tsx`: UI composition and coordination of keyboard, gamepad, WebSocket, light, and gauges.
 - `ui/src/hooks/`: browser connection and input polling logic.
 - `ui/src/components/`: presentational and control components.
