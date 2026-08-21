@@ -163,6 +163,22 @@ function App() {
             </span>
           )}
           <button
+            onClick={() => window.location.reload()}
+            title="Refresh page"
+            style={{
+              padding: "4px 10px",
+              fontSize: 13,
+              fontFamily: "monospace",
+              cursor: "pointer",
+              borderRadius: 4,
+              border: "1px solid #2a2a3a",
+              background: "#0f0f13",
+              color: "#e0e0e0",
+            }}
+          >
+            Refresh
+          </button>
+          <button
             onClick={toggleLight}
             title="Toggle light (L)"
             style={{

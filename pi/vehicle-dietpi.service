@@ -1,0 +1,19 @@
+[Unit]
+Description=RasPi Universal Vehicle server
+Wants=network-online.target
+After=network-online.target systemd-modules-load.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/vehicle
+ExecStartPre=/usr/sbin/modprobe bcm2835-isp
+ExecStartPre=/usr/sbin/modprobe bcm2835-codec
+ExecStart=/usr/bin/python3 /opt/vehicle/server.py
+Restart=on-failure
+RestartSec=2
+TimeoutStopSec=10
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target

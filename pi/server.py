@@ -120,7 +120,10 @@ async def run_servers():
         loop.add_signal_handler(sig, stop_event.set)
 
     global mjpeg_server
-    camera.start()
+    try:
+        camera.start()
+    except RuntimeError as exc:
+        logger.warning(f"Camera unavailable; continuing without video: {exc}")
     mjpeg_server = ThreadingHTTPServer((MJPEG_HOST, MJPEG_PORT), MJPEGHandler)
     mjpeg_thread = threading.Thread(target=run_mjpeg_server, args=(mjpeg_server,), daemon=True)
     mjpeg_thread.start()

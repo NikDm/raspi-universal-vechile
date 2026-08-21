@@ -119,17 +119,6 @@ export function Controls({ onCommand }: ControlsProps) {
       sendLevels();
     };
 
-    const stopOnBlur = () => {
-      resetLevels();
-      onCommand({ type: "stop" });
-    };
-
-    const stopOnHidden = () => {
-      if (document.hidden) {
-        stopOnBlur();
-      }
-    };
-
     const guardedKeyDown = (e: KeyboardEvent) => {
       if (isTypingTarget(e.target)) {
         return;
@@ -138,13 +127,9 @@ export function Controls({ onCommand }: ControlsProps) {
     };
 
     window.addEventListener("keydown", guardedKeyDown);
-    window.addEventListener("blur", stopOnBlur);
-    document.addEventListener("visibilitychange", stopOnHidden);
 
     return () => {
       window.removeEventListener("keydown", guardedKeyDown);
-      window.removeEventListener("blur", stopOnBlur);
-      document.removeEventListener("visibilitychange", stopOnHidden);
     };
   }, [onCommand, resetLevels, sendLevels]);
 

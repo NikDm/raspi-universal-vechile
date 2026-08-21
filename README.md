@@ -157,6 +157,15 @@ commands before restarting. To disable automatic startup and stop the server:
 sudo systemctl disable --now vehicle.service
 ```
 
+For a root-only DietPi installation deployed to `/opt/vehicle`, install the
+DietPi-specific unit instead:
+
+```bash
+install -m 0644 vehicle-dietpi.service /etc/systemd/system/vehicle.service
+systemctl daemon-reload
+systemctl enable --now vehicle.service
+```
+
 ## PC Setup
 
 ### Windows desktop application
@@ -259,7 +268,10 @@ and attaches it to a versioned GitHub Release.
 | D / Arrow Right | Turn right |
 | Space | Brake (stop) |
 
-The UI ignores driving keys while you are typing in the Pi IP field, and it sends `stop` automatically if the browser tab loses focus.
+The UI ignores driving keys while you are typing in the Pi IP field. Switching tabs or moving focus away from the browser leaves the current keyboard motor levels unchanged; press Space to stop.
+
+Use the **Refresh** button in the header to reload the UI, equivalent to
+pressing Ctrl+R in a browser.
 
 ### Gamepad Controls
 
@@ -298,6 +310,7 @@ raspi-universal-vechile/
 │   ├── motor_controller.py # gpiozero wrapper
 │   ├── camera.py          # picamera2 MJPEG
 │   ├── vehicle.service    # systemd boot service
+│   ├── vehicle-dietpi.service # root-only DietPi systemd service
 │   └── requirements.txt   # Python deps
 ├── ui/
 │   ├── desktop/
@@ -352,6 +365,10 @@ rpicam-hello --list-cameras
 ```
 
 Note: `vcgencmd get_camera` is the legacy check and will report `detected=0` on Bookworm even when the camera works correctly — use `rpicam-hello --list-cameras` instead.
+
+If no camera is detected when the server starts, it logs a warning and continues
+serving motor and light controls. The video feed remains unavailable until a
+camera is connected and the server is restarted.
 
 If the camera is not listed, add `dtoverlay=<sensor>` under `[all]` in `/boot/firmware/config.txt` (e.g. `dtoverlay=ov5647` for OV5647-based modules like the SainSmart 5MP fisheye) and reboot.
 

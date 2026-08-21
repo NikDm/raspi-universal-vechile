@@ -33,7 +33,7 @@ The long-term direction is stronger agentic support and reliable, task-oriented 
    - `{"type":"move","left":number,"right":number}`
    - `{"type":"stop"}`
    - `{"type":"light","on"?:boolean}`
-5. Browser controls must not capture driving shortcuts while the user is typing. Loss of focus, controller disconnect, or loss of the controlling input should result in a stop where applicable.
+5. Browser controls must not capture driving shortcuts while the user is typing. Tab blur intentionally preserves keyboard motor levels; controller disconnect or loss of the controlling input should still result in a stop where applicable.
 6. Avoid extra runtime dependencies unless they provide clear value on constrained hardware. Explain and document new dependencies.
 7. Never assume Raspberry Pi GPIO or camera hardware is available on the development machine.
 
