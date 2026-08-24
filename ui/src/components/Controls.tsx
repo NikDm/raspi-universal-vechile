@@ -74,6 +74,23 @@ export function Controls({ onCommand }: ControlsProps) {
     levelsRef.current = { left: 0, right: 0 };
   }, []);
 
+  const stop = useCallback(() => {
+    resetLevels();
+    onCommand({ type: "stop" });
+  }, [onCommand, resetLevels]);
+
+  const adjustThrottle = useCallback(
+    (delta: 1 | -1) => {
+      const levels = levelsRef.current;
+      levelsRef.current = {
+        left: clampLevel(levels.left + delta),
+        right: clampLevel(levels.right + delta),
+      };
+      sendLevels();
+    },
+    [sendLevels]
+  );
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.repeat) return;
@@ -107,9 +124,8 @@ export function Controls({ onCommand }: ControlsProps) {
           levelsRef.current = steer(levels, "right");
           break;
         case "Space":
-          resetLevels();
           e.preventDefault();
-          sendLevels();
+          stop();
           return;
         default:
           return;
@@ -131,22 +147,84 @@ export function Controls({ onCommand }: ControlsProps) {
     return () => {
       window.removeEventListener("keydown", guardedKeyDown);
     };
-  }, [onCommand, resetLevels, sendLevels]);
+  }, [onCommand, sendLevels, stop]);
 
   return (
     <div
-      style={{
-        padding: "12px 16px",
-        background: "#1a1a24",
-        borderTop: "1px solid #2a2a3a",
-        fontSize: 13,
-        color: "#888",
-        fontFamily: "monospace",
-      }}
-    >
-      <span style={{ marginRight: 16 }}>
-        Up/Down: both motors +/- 1 level &nbsp;|&nbsp; Left/Right: straighten, then steer by 2 &nbsp;|&nbsp; Space: stop &nbsp;|&nbsp; L: light
-      </span>
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: 16,
+          transform: "translateY(-50%)",
+          zIndex: 10,
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+        }}
+      >
+        <button
+          type="button"
+          aria-label="Increase throttle"
+          title="Increase throttle"
+          onClick={() => adjustThrottle(1)}
+          style={{
+            width: 80,
+            height: 65,
+            borderRadius: 8,
+            border: "1px solid rgba(120, 120, 145, 0.65)",
+            background: "rgba(37, 37, 53, 0.65)",
+            color: "#e0e0e0",
+            fontSize: 28,
+            lineHeight: 1,
+            cursor: "pointer",
+            touchAction: "manipulation",
+            userSelect: "none",
+          }}
+        >
+          ↑
+        </button>
+        <button
+          type="button"
+          aria-label="Stop"
+          title="Stop"
+          onClick={stop}
+          style={{
+            width: 80,
+            height: 58,
+            borderRadius: 8,
+            border: "1px solid rgba(248, 113, 113, 0.8)",
+            background: "rgba(127, 29, 29, 0.72)",
+            color: "#fecaca",
+            fontSize: 15,
+            fontWeight: 700,
+            cursor: "pointer",
+            touchAction: "manipulation",
+            userSelect: "none",
+          }}
+        >
+          STOP
+        </button>
+        <button
+          type="button"
+          aria-label="Decrease throttle"
+          title="Decrease throttle"
+          onClick={() => adjustThrottle(-1)}
+          style={{
+            width: 80,
+            height: 65,
+            borderRadius: 8,
+            border: "1px solid rgba(120, 120, 145, 0.65)",
+            background: "rgba(37, 37, 53, 0.65)",
+            color: "#e0e0e0",
+            fontSize: 28,
+            lineHeight: 1,
+            cursor: "pointer",
+            touchAction: "manipulation",
+            userSelect: "none",
+          }}
+        >
+          ↓
+        </button>
     </div>
   );
 }

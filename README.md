@@ -215,6 +215,36 @@ Open http://localhost:3000 in your browser.
 
 Enter the Pi's IP address in the input field. The UI will auto-connect and remember the last value in local storage.
 
+### Install the offline web app on Android
+
+The production UI is an installable PWA. Its application shell is cached, so
+after the first successful installation it can launch without access to the
+hosting network. The live controls and video still require a LAN connection to
+the Pi.
+
+1. Build and publish `ui/dist/` on an HTTPS website. A raw IP address served
+   over HTTP is not sufficient for reliable PWA installation.
+2. Open that HTTPS URL in Chrome on the Android phone while it has internet
+   access.
+3. Wait for the first page load to complete, then choose **Install app** from
+   Chrome's menu.
+4. Launch the installed app once while still online so the initial cache and
+   any service-worker update can finish.
+5. Connect the phone to the vehicle Ethernet network and open the installed
+   app. The default Pi address is `192.168.50.1`; it can be changed from
+   **Info** and is saved between launches.
+
+Android may prefer an internet-capable WiFi or cellular network over isolated
+Ethernet. Select Ethernet as the preferred network or temporarily disable the
+other transports. The HTTPS-hosted PWA also needs the browser's local-network
+permission to open the Pi's unencrypted `ws://` control socket and HTTP MJPEG
+stream. Browser support for HTTPS-to-local-HTTP access varies; use the regular
+HTTP UI on the Pi or a native Android wrapper if the installed PWA cannot reach
+those endpoints.
+
+The offline cache contains only the UI application shell. It intentionally does
+not cache the camera stream or vehicle commands.
+
 ### Build or run the desktop application locally
 
 Use Node.js 18 or newer for local development. Release automation uses Node.js
@@ -273,6 +303,14 @@ The UI ignores driving keys while you are typing in the Pi IP field. Switching t
 Use the **Refresh** button in the header to reload the UI, equivalent to
 pressing Ctrl+R in a browser.
 
+On a touchscreen, tap the semi-transparent **↑**, **STOP**, and **↓** buttons
+over the video feed to change throttle or stop immediately.
+
+The camera feed is centered and preserves its native 4:3 aspect ratio.
+
+Use the **Info** button to edit the Pi IP address and view control instructions.
+Opening the dialog stops the vehicle and temporarily disables driving controls.
+
 ### Gamepad Controls
 
 Connect any USB or Bluetooth gamepad (Xbox, PlayStation, etc.). The left stick controls steering and throttle with a deadzone of 0.1.
@@ -326,6 +364,8 @@ raspi-universal-vechile/
 │   │   └── hooks/
 │   │       ├── useWebSocket.ts
 │   │       └── useGamepad.ts
+│   ├── public/
+│   │   └── icons/          # Android/PWA installation icons
 │   ├── package.json
 │   ├── vite.config.ts
 │   └── tsconfig.json

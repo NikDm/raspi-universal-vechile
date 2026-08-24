@@ -16,13 +16,14 @@ function clampSpeed(value: number) {
 }
 
 function getInitialPiIp() {
-  return window.localStorage.getItem(PI_IP_STORAGE_KEY) ?? "192.168.0.29";
+  return window.localStorage.getItem(PI_IP_STORAGE_KEY) ?? "192.168.50.1";
 }
 
 function App() {
   const [piIp, setPiIp] = useState(getInitialPiIp);
   const [speeds, setSpeeds] = useState({ left: 0, right: 0 });
   const [lightOn, setLightOn] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
   const prevSpeedsRef = useRef({ left: 0, right: 0 });
   const inputSourceRef = useRef<"keyboard" | "gamepad" | null>(null);
   const { sendCommand: rawSendCommand, status: wsStatus } = useWebSocket({
@@ -65,6 +66,13 @@ function App() {
     [sendCommand]
   );
 
+  const openInfo = useCallback(() => {
+    inputSourceRef.current = null;
+    prevSpeedsRef.current = { left: 0, right: 0 };
+    sendCommand({ type: "stop" });
+    setInfoOpen(true);
+  }, [sendCommand]);
+
   useEffect(() => {
     window.localStorage.setItem(PI_IP_STORAGE_KEY, piIp);
   }, [piIp]);
@@ -102,7 +110,7 @@ function App() {
   }, [gamepad.connected, sendCommand]);
 
   useEffect(() => {
-    if (!gamepad.connected) {
+    if (infoOpen || !gamepad.connected) {
       return;
     }
 
@@ -134,7 +142,7 @@ function App() {
       }
       prevSpeedsRef.current = { left, right };
     }
-  }, [gamepad, sendCommand]);
+  }, [gamepad, infoOpen, sendCommand]);
 
   return (
     <div
@@ -162,6 +170,22 @@ function App() {
               Gamepad connected
             </span>
           )}
+          <button
+            onClick={openInfo}
+            title="Open connection and control information"
+            style={{
+              padding: "4px 10px",
+              fontSize: 13,
+              fontFamily: "monospace",
+              cursor: "pointer",
+              borderRadius: 4,
+              border: "1px solid #2a2a3a",
+              background: "#0f0f13",
+              color: "#e0e0e0",
+            }}
+          >
+            Info
+          </button>
           <button
             onClick={() => window.location.reload()}
             title="Refresh page"
@@ -241,35 +265,107 @@ function App() {
         </div>
       </div>
 
-      <div
-        style={{
-          padding: "8px 16px",
-          background: "#16161e",
-          borderTop: "1px solid #2a2a3a",
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-        }}
-      >
-        <label style={{ fontSize: 13, color: "#888" }}>Pi IP:</label>
-        <input
-          type="text"
-          value={piIp}
-          onChange={(e) => setPiIp(e.target.value)}
-          style={{
-            background: "#0f0f13",
-            border: "1px solid #2a2a3a",
-            color: "#e0e0e0",
-            borderRadius: 4,
-            padding: "4px 8px",
-            fontFamily: "monospace",
-            fontSize: 13,
-            width: 140,
-          }}
-        />
-      </div>
+      {!infoOpen && <Controls onCommand={handleCommand} />}
 
-      <Controls onCommand={handleCommand} />
+      {infoOpen && (
+        <div
+          role="presentation"
+          onClick={() => setInfoOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 100,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+            background: "rgba(0, 0, 0, 0.72)",
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="info-title"
+            onClick={(event) => event.stopPropagation()}
+            style={{
+              width: "min(420px, 100%)",
+              maxHeight: "calc(100vh - 32px)",
+              overflowY: "auto",
+              padding: 20,
+              borderRadius: 10,
+              border: "1px solid #3a3a4d",
+              background: "#16161e",
+              boxShadow: "0 16px 48px rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 16,
+                marginBottom: 18,
+              }}
+            >
+              <h2 id="info-title" style={{ margin: 0, fontSize: 18 }}>
+                Connection & Controls
+              </h2>
+              <button
+                type="button"
+                onClick={() => setInfoOpen(false)}
+                style={{
+                  padding: "5px 10px",
+                  borderRadius: 4,
+                  border: "1px solid #3a3a4d",
+                  background: "#0f0f13",
+                  color: "#e0e0e0",
+                  cursor: "pointer",
+                }}
+              >
+                Close
+              </button>
+            </div>
+
+            <label
+              htmlFor="pi-ip"
+              style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}
+            >
+              Pi IP address
+            </label>
+            <input
+              id="pi-ip"
+              type="text"
+              value={piIp}
+              onChange={(event) => setPiIp(event.target.value)}
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                background: "#0f0f13",
+                border: "1px solid #3a3a4d",
+                color: "#e0e0e0",
+                borderRadius: 4,
+                padding: "8px 10px",
+                fontFamily: "monospace",
+                fontSize: 14,
+              }}
+            />
+
+            <h3 style={{ margin: "20px 0 8px", fontSize: 15 }}>Controls</h3>
+            <div style={{ color: "#aaa", fontSize: 13, lineHeight: 1.7 }}>
+              <div>W / ↑ — increase both motor levels</div>
+              <div>S / ↓ — decrease both motor levels</div>
+              <div>A / ← — straighten, then turn left</div>
+              <div>D / → — straighten, then turn right</div>
+              <div>Space — stop immediately</div>
+              <div>L — toggle the light</div>
+              <div>Touch ↑ / STOP / ↓ — throttle and immediate stop</div>
+            </div>
+            <p style={{ margin: "16px 0 0", color: "#777", fontSize: 12 }}>
+              Opening this dialog stops the vehicle. WebSocket: {WS_PORT}; video: {MJPEG_PORT}.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

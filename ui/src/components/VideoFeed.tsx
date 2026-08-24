@@ -36,24 +36,37 @@ export function VideoFeed({ src }: VideoFeedProps) {
     <div
       style={{
         flex: 1,
-        background: "#000",
+        background: "#0f0f13",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         minHeight: 0,
+        padding: 12,
+        boxSizing: "border-box",
       }}
     >
-      <img
-        key={retryCount}
-        src={src}
-        alt="Vehicle camera feed"
-        onError={retryVideo}
+      <div
         style={{
-          width: "100%",
           height: "100%",
-          objectFit: "contain",
+          maxWidth: "100%",
+          aspectRatio: "4 / 3",
+          background: "#000",
+          overflow: "hidden",
         }}
-      />
+      >
+        <img
+          key={retryCount}
+          src={src}
+          alt="Vehicle camera feed"
+          onError={retryVideo}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            display: "block",
+          }}
+        />
+      </div>
     </div>
   );
 }
