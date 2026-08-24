@@ -34,6 +34,7 @@ export function VideoFeed({ src }: VideoFeedProps) {
 
   return (
     <div
+      className="video-feed"
       style={{
         flex: 1,
         background: "#0f0f13",
@@ -46,6 +47,7 @@ export function VideoFeed({ src }: VideoFeedProps) {
       }}
     >
       <div
+        className="video-frame"
         style={{
           height: "100%",
           maxWidth: "100%",

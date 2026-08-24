@@ -1,0 +1,103 @@
+.app-shell,
+.app-header,
+.header-actions {
+  min-width: 0;
+}
+
+@media (max-width: 600px) and (orientation: portrait) {
+  .app-header {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: max(8px, env(safe-area-inset-top)) 10px 8px !important;
+  }
+
+  .app-title {
+    flex: 1 1 100%;
+    font-size: 14px !important;
+  }
+
+  .header-actions {
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    gap: 6px !important;
+  }
+
+  .header-button {
+    min-height: 36px;
+    padding: 5px 9px !important;
+  }
+
+  .connection-indicator {
+    margin-left: auto;
+    gap: 6px !important;
+    font-size: 12px !important;
+  }
+
+  .connection-address {
+    display: none;
+  }
+
+  .video-stage,
+  .video-feed {
+    flex: 0 0 auto !important;
+    width: 100%;
+  }
+
+  .video-feed {
+    padding: 0 !important;
+  }
+
+  .video-frame {
+    width: 100%;
+    height: auto !important;
+    max-width: none !important;
+    aspect-ratio: 4 / 3;
+  }
+
+  .gauge-panel {
+    right: 8px !important;
+    bottom: 8px !important;
+    padding: 7px 9px !important;
+  }
+
+  .drive-controls {
+    top: auto !important;
+    right: 0;
+    bottom: 0;
+    left: 0 !important;
+    transform: none !important;
+    flex-direction: row !important;
+    justify-content: center;
+    gap: 10px !important;
+    padding: 10px max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    background: linear-gradient(to top, #0f0f13 70%, rgba(15, 15, 19, 0));
+  }
+
+  .drive-button {
+    width: min(29vw, 112px) !important;
+    height: 68px !important;
+  }
+
+  .drive-button-stop {
+    order: 2;
+  }
+
+  .drive-button-throttle:first-of-type {
+    order: 1;
+  }
+
+  .drive-button-throttle:last-of-type {
+    order: 3;
+  }
+}
+
+@media (max-width: 380px) and (orientation: portrait) {
+  .app-title,
+  .header-actions {
+    width: 100%;
+  }
+
+  .light-button {
+    margin-left: auto;
+  }
+}

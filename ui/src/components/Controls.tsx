@@ -151,6 +151,7 @@ export function Controls({ onCommand }: ControlsProps) {
 
   return (
     <div
+        className="drive-controls"
         style={{
           position: "fixed",
           top: "50%",
@@ -163,6 +164,7 @@ export function Controls({ onCommand }: ControlsProps) {
         }}
       >
         <button
+          className="drive-button drive-button-throttle"
           type="button"
           aria-label="Increase throttle"
           title="Increase throttle"
@@ -184,6 +186,7 @@ export function Controls({ onCommand }: ControlsProps) {
           ↑
         </button>
         <button
+          className="drive-button drive-button-stop"
           type="button"
           aria-label="Stop"
           title="Stop"
@@ -205,6 +208,7 @@ export function Controls({ onCommand }: ControlsProps) {
           STOP
         </button>
         <button
+          className="drive-button drive-button-throttle"
           type="button"
           aria-label="Decrease throttle"
           title="Decrease throttle"

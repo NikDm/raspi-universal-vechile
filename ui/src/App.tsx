@@ -6,6 +6,7 @@ import { Controls } from "./components/Controls";
 import { ConnectionIndicator } from "./components/ConnectionIndicator";
 import { MotorGauge } from "./components/MotorGauge";
 import type { Command } from "./types";
+import "./app.css";
 
 const WS_PORT = 8080;
 const MJPEG_PORT = 8081;
@@ -146,6 +147,7 @@ function App() {
 
   return (
     <div
+      className="app-shell"
       style={{
         height: "100%",
         display: "flex",
@@ -154,6 +156,7 @@ function App() {
       }}
     >
       <div
+        className="app-header"
         style={{
           display: "flex",
           alignItems: "center",
@@ -163,14 +166,15 @@ function App() {
           borderBottom: "1px solid #2a2a3a",
         }}
       >
-        <span style={{ fontWeight: 600, fontSize: 15 }}>RasPi Vehicle Control</span>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <span className="app-title" style={{ fontWeight: 600, fontSize: 15 }}>RasPi Vehicle Control</span>
+        <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {gamepad.connected && (
             <span style={{ fontSize: 12, color: "#22c55e", fontFamily: "monospace" }}>
               Gamepad connected
             </span>
           )}
           <button
+            className="header-button"
             onClick={openInfo}
             title="Open connection and control information"
             style={{
@@ -187,6 +191,7 @@ function App() {
             Info
           </button>
           <button
+            className="header-button"
             onClick={() => window.location.reload()}
             title="Refresh page"
             style={{
@@ -203,6 +208,7 @@ function App() {
             Refresh
           </button>
           <button
+            className="header-button light-button"
             onClick={toggleLight}
             title="Toggle light (L)"
             style={{
@@ -240,6 +246,7 @@ function App() {
       </div>
 
       <div
+        className="video-stage"
         style={{
           flex: 1,
           display: "flex",
@@ -250,6 +257,7 @@ function App() {
       >
         <VideoFeed src={`http://${piIp}:${MJPEG_PORT}/video`} />
         <div
+          className="gauge-panel"
           style={{
             position: "absolute",
             bottom: 12,

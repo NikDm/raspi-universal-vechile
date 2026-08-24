@@ -15,6 +15,7 @@ export function ConnectionIndicator({ status, ip, wsPort, videoPort }: Connectio
 
   return (
     <div
+      className="connection-indicator"
       style={{
         display: "flex",
         alignItems: "center",
@@ -35,7 +36,7 @@ export function ConnectionIndicator({ status, ip, wsPort, videoPort }: Connectio
       />
       <span style={{ color }}>{label}</span>
       {ip && (
-        <span style={{ color: "#666", marginLeft: 8 }}>
+        <span className="connection-address" style={{ color: "#666", marginLeft: 8 }}>
           ws://{ip}:{wsPort} | mjpeg://{ip}:{videoPort}
         </span>
       )}
